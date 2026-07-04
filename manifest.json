@@ -1,0 +1,661 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "aave-compat",
+  "did": "did:web:etzhayyim.com:actor:aave-compat",
+  "kind": "compat",
+  "title": "aave clean-room actor",
+  "description": "Clean-room, API-compatible web3 / blockchain RPC actor (aave); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreidytpismfkcitfathhfhibefvg6o4tgseipdd6tcvwstayenaitye",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreidytpismfkcitfathhfhibefvg6o4tgseipdd6tcvwstayenaitye",
+  "schema": "schema/aave.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://raw.githubusercontent.com/aave-dao/aave-v3-origin/main/src/contracts/protocol/libraries/types/DataTypes.sol",
+    "verifiedAt": "2026-06-11",
+    "resources": [
+      "ReserveData",
+      "EModeCategory",
+      "UserConfigurationMap",
+      "ExecuteBorrowParams"
+    ],
+    "enums": {
+      "ExecuteBorrowParams": {
+        "interestRateMode": [
+          "NONE",
+          "__DEPRECATED",
+          "VARIABLE"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "ReserveData",
+    "EModeCategory",
+    "UserConfigurationMap",
+    "ExecuteBorrowParams"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 20,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/reservedatas",
+          "op": "create ReserveData"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/reservedatas",
+          "op": "list ReserveData"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/reservedatas/{id}",
+          "op": "get ReserveData"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/reservedatas/{id}",
+          "op": "update ReserveData"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/reservedatas/{id}",
+          "op": "delete ReserveData"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/emodecategories",
+          "op": "create EModeCategory"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/emodecategories",
+          "op": "list EModeCategory"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/emodecategories/{id}",
+          "op": "get EModeCategory"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/emodecategories/{id}",
+          "op": "update EModeCategory"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/emodecategories/{id}",
+          "op": "delete EModeCategory"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/userconfigurationmaps",
+          "op": "create UserConfigurationMap"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/userconfigurationmaps",
+          "op": "list UserConfigurationMap"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/userconfigurationmaps/{id}",
+          "op": "get UserConfigurationMap"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/userconfigurationmaps/{id}",
+          "op": "update UserConfigurationMap"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/userconfigurationmaps/{id}",
+          "op": "delete UserConfigurationMap"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/executeborrowparamses",
+          "op": "create ExecuteBorrowParams"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/executeborrowparamses",
+          "op": "list ExecuteBorrowParams"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/executeborrowparamses/{id}",
+          "op": "get ExecuteBorrowParams"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/executeborrowparamses/{id}",
+          "op": "update ExecuteBorrowParams"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/executeborrowparamses/{id}",
+          "op": "delete ExecuteBorrowParams"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "aave-compat",
+            "purl": "pkg:etzhayyim/aave-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "aave.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 20,
+      "tools": [
+        {
+          "name": "create_reserve_data",
+          "description": "Create a ReserveData.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "liquidityIndex": {
+                "type": "integer"
+              },
+              "currentLiquidityRate": {
+                "type": "integer"
+              },
+              "variableBorrowIndex": {
+                "type": "integer"
+              },
+              "currentVariableBorrowRate": {
+                "type": "integer"
+              },
+              "deficit": {
+                "type": "integer"
+              },
+              "lastUpdateTimestamp": {
+                "type": "integer"
+              },
+              "liquidationGracePeriodUntil": {
+                "type": "integer"
+              },
+              "aTokenAddress": {
+                "type": "string"
+              },
+              "variableDebtTokenAddress": {
+                "type": "string"
+              },
+              "accruedToTreasury": {
+                "type": "integer"
+              },
+              "virtualUnderlyingBalance": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "liquidityIndex",
+              "currentLiquidityRate"
+            ]
+          }
+        },
+        {
+          "name": "list_reserve_datas",
+          "description": "List ReserveDatas.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_reserve_data",
+          "description": "Get a ReserveData by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_reserve_data",
+          "description": "Update a ReserveData.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "liquidityIndex": {
+                "type": "integer"
+              },
+              "currentLiquidityRate": {
+                "type": "integer"
+              },
+              "variableBorrowIndex": {
+                "type": "integer"
+              },
+              "currentVariableBorrowRate": {
+                "type": "integer"
+              },
+              "deficit": {
+                "type": "integer"
+              },
+              "lastUpdateTimestamp": {
+                "type": "integer"
+              },
+              "liquidationGracePeriodUntil": {
+                "type": "integer"
+              },
+              "aTokenAddress": {
+                "type": "string"
+              },
+              "variableDebtTokenAddress": {
+                "type": "string"
+              },
+              "accruedToTreasury": {
+                "type": "integer"
+              },
+              "virtualUnderlyingBalance": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_reserve_data",
+          "description": "Delete a ReserveData.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_e_mode_category",
+          "description": "Create a EModeCategory.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ltv": {
+                "type": "integer"
+              },
+              "liquidationThreshold": {
+                "type": "integer"
+              },
+              "liquidationBonus": {
+                "type": "integer"
+              },
+              "collateralBitmap": {
+                "type": "integer"
+              },
+              "isolated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "borrowableBitmap": {
+                "type": "integer"
+              },
+              "ltvzeroBitmap": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "ltv",
+              "liquidationThreshold"
+            ]
+          }
+        },
+        {
+          "name": "list_e_mode_categories",
+          "description": "List EModeCategories.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_e_mode_category",
+          "description": "Get a EModeCategory by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_e_mode_category",
+          "description": "Update a EModeCategory.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "ltv": {
+                "type": "integer"
+              },
+              "liquidationThreshold": {
+                "type": "integer"
+              },
+              "liquidationBonus": {
+                "type": "integer"
+              },
+              "collateralBitmap": {
+                "type": "integer"
+              },
+              "isolated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "borrowableBitmap": {
+                "type": "integer"
+              },
+              "ltvzeroBitmap": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_e_mode_category",
+          "description": "Delete a EModeCategory.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_user_configuration_map",
+          "description": "Create a UserConfigurationMap.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        },
+        {
+          "name": "list_user_configuration_maps",
+          "description": "List UserConfigurationMaps.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_user_configuration_map",
+          "description": "Get a UserConfigurationMap by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_user_configuration_map",
+          "description": "Update a UserConfigurationMap.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "data": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_user_configuration_map",
+          "description": "Delete a UserConfigurationMap.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_execute_borrow_params",
+          "description": "Create a ExecuteBorrowParams.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "asset": {
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              },
+              "onBehalfOf": {
+                "type": "string"
+              },
+              "interestRateStrategyAddress": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "interestRateMode": {
+                "type": "string"
+              },
+              "referralCode": {
+                "type": "integer"
+              },
+              "releaseUnderlying": {
+                "type": "boolean"
+              },
+              "oracle": {
+                "type": "string"
+              },
+              "userEModeCategory": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "asset",
+              "user"
+            ]
+          }
+        },
+        {
+          "name": "list_execute_borrow_paramses",
+          "description": "List ExecuteBorrowParamses.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_execute_borrow_params",
+          "description": "Get a ExecuteBorrowParams by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_execute_borrow_params",
+          "description": "Update a ExecuteBorrowParams.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "asset": {
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              },
+              "onBehalfOf": {
+                "type": "string"
+              },
+              "interestRateStrategyAddress": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "interestRateMode": {
+                "type": "string"
+              },
+              "referralCode": {
+                "type": "integer"
+              },
+              "releaseUnderlying": {
+                "type": "boolean"
+              },
+              "oracle": {
+                "type": "string"
+              },
+              "userEModeCategory": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_execute_borrow_params",
+          "description": "Delete a ExecuteBorrowParams.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
