@@ -39,6 +39,20 @@
           (is (case kind :int (integer? (get rec f)) :float (float? (get rec f)) :bool (boolean? (get rec f)) true)
               (str entity "/" (name f))))))))
 
+(deftest update-coercion
+  ;; CONFIRMED BUG regression: handle-update never ran field values through
+  ;; coerce-field the way handle-create does, so updating a :bool/:int/:float
+  ;; field with a raw string (plausible from a JSON request body) silently
+  ;; stored the wrong type instead of coercing it.
+  (doseq [{:keys [entity coerce] :as spec} m/entity-specs]
+    (when (seq coerce)
+      (let [s (m/fresh-store) [rec _] (m/handle-create s entity (full-record spec))]
+        (doseq [[f kind] coerce]
+          (let [str-val (case kind :int "42" :float "42.5" :bool "true" "x")
+                [updated _] (m/handle-update s entity (:id rec) {f str-val})]
+            (is (case kind :int (integer? (get updated f)) :float (float? (get updated f)) :bool (boolean? (get updated f)) true)
+                (str entity "/" (name f) " update coercion"))))))))
+
 (deftest healthz
   (let [[body status] (m/healthz)]
     (is (= 200 status)) (is (= "aave-compat" (:actor body))) (is (= (set m/entities) (set (:entities body))))))
