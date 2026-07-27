@@ -10,7 +10,7 @@
   "runtime": "kotoba-wasm",
   "exec": "browser-local|donated-mesh",
   "ipfs": "ipfs://bafkreidytpismfkcitfathhfhibefvg6o4tgseipdd6tcvwstayenaitye",
-  "schema": "schema/aave.kotoba",
+  "schema": "schema/aave.kotoba-schema",
   "tier": "L5",
   "verified": {
     "source": "https://raw.githubusercontent.com/aave-dao/aave-v3-origin/main/src/contracts/protocol/libraries/types/DataTypes.sol",
