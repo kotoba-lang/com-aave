@@ -240,7 +240,27 @@
   :why-it-is-recorded
   "Had it been written down as measured, this file would say the store layer
    is blocked on the native backend, and nine other repos in this family would
-   have inherited that. The loader's default budget is not the language."}
+   have inherited that. The loader's default budget is not the language."
+  :and-it-bit-a-second-time-within-the-hour
+  "Reproducing the above independently, every oracle kept trapping WITH
+   KEXE_FUEL raised, and `KEXE_STRUCTURED_REPORT=1` said why: `:fuel {:initial
+   512 :remaining 0}` -- the budget was never applied. The loader binary had
+   been built from tools/kexe_loader.c in the SHARED checkout
+   orgs/kotoba-lang/amu, which sits on a local cron-tick commit and contains
+   the string KEXE_FUEL zero times; at amu's pin it appears three times.
+   Rebuilt from the pin, the same call answers `:status :ok :result 201`.
+   Same error class as :the-internal-compiler-error-was-mine and as the
+   jvm-surface detector's amu finding, three times in one session: a number
+   read off a tree that is not the one being reasoned about. The detector now
+   marks its own instance of it (root 3bef1bf6); nothing marks this one except
+   this sentence."
+  :independent-rerun
+  "14 of 14 oracle-handlers selectors agree with aave.main once the loader is
+   built from the pin: 201/400/400/200/200/404/200/404/200/404/1/3/2/99. The
+   two 400s are correct and my first table was wrong -- fixture 1 omits a
+   :required field and fixture 2 carries an unknown one, so require-fields and
+   reject-unknown are supposed to answer 400. main answers 20, which is
+   aave.main/routes' length (4 entities x 5 routes)."}
 
  :layers-of-main-cljc
  ;; One entry per layer of src/aave/main.cljc. :ported means the layer is in
