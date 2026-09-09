@@ -1,0 +1,8 @@
+;; Does the vector-of-{keyword -> string} literal that whole_component.kotoba
+;; already carries survive being USED? The earlier probe p-vecmaps.kotoba only
+;; DEFINED it; an unused def may never be typed.
+(ns p (:export [main]))
+(def specs [{:entity "ReserveData" :plural "reservedatas"}
+            {:entity "EModeCategory" :plural "emodecategories"}])
+(defn how-many [] :i64 (count specs))
+(defn main [] :i64 (how-many))

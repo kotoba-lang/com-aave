@@ -1,0 +1,9 @@
+;; aave.main/as-float parses an untrusted string to a double, catching a parse
+;; failure and answering 0.0. Is :f64 admitted, and is there a decimal parser
+;; whose failure is representable rather than a trap?
+(ns p (:export [main]))
+(defn parse [s :string] :f64
+  ;; the parser answers [:option :f64] -- the catch arm of as-float, by type
+  (option-value-of [:option :f64] (decimal-f64-parse s) 0.0))
+(defn as-doc [s :string] :document (document-f64 (parse s)))
+(defn main [] :i64 (f64-to-i64-truncating (parse "3.5")))

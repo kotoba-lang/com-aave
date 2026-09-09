@@ -1,0 +1,5 @@
+;; Narrowing p06 the other way: a map as a RETURN type only.
+(ns p (:export [main]))
+(defn kinds [] [:map :keyword :i64]
+  (typed-map-new [:map :keyword :i64] :ltv 1 :isolated 3))
+(defn main [] :i64 (typed-map-get (kinds) :isolated 0))

@@ -1,0 +1,6 @@
+;; The store is keyed by entity NAME (a string in main.cljc). document map keys
+;; must be keyword or document -- is there a string->keyword and back?
+(ns p (:export [main]))
+(defn k [s :string] :keyword (keyword-from-string s))
+(defn n [x :keyword] :string (keyword-name x))
+(defn main [] :i64 (string-byte-length (n (k "ReserveData"))))

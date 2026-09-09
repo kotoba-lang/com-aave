@@ -1,0 +1,4 @@
+;; string-join takes a separator plus at most eight parts.
+(ns p (:export [main]))
+(defn six [a :string] :string (string-join "|" a a a a a a))
+(defn main [] :i64 (string-byte-length (six "x")))

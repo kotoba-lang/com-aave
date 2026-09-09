@@ -1,0 +1,18 @@
+;; THE MEASUREMENT THAT CHOSE THE CARRIER.
+;;
+;; `amu check` admits :document. `amu compile --target aarch64-macos` does not.
+;; So a component written on the :document carrier passes check, produces no
+;; artifact, and can never be RUN -- which is the whole acceptance criterion.
+;;
+;;   ./bin/amu check   --jvm-free <this>                      -> exit 0
+;;   ./bin/amu compile <this> --target aarch64-macos ...      -> exit 70
+;;   "typed values currently require the kotoba-script web target, typed Wasm
+;;    target, or qualified native string/scalar-record/option-i64/result-i64
+;;    features"
+;;
+;; The same pair of verdicts holds for amu's own examples/todo-app.kotoba
+;; (document carrier, native exit 70) and examples/approval-queue-app.kotoba
+;; (string carrier, native exit 0). That is why this port carries its rows as
+;; JSON text the way approval-queue-app does, and not as documents.
+(ns p (:export [main]))
+(defn main [] :i64 (document-count (document-vector (document-string "a"))))

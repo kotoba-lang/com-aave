@@ -1,0 +1,16 @@
+;; The heterogeneous carrier: one entity-spec row as a :document, read back.
+(ns p (:export [main]))
+(defn dget [d :document k :keyword] :document
+  (option-value-of [:option :document] (document-get d k) (document-null)))
+(defn dstr [d :document] :string
+  (option-value-of [:option :string] (document-string-value d) ""))
+(defn spec [] :document
+  (document-map :entity (document-string "ReserveData")
+                :plural (document-string "reservedatas")
+                :id-prefix (document-string "aave_res")
+                :fields (document-vector (document-keyword :liquidityIndex)
+                                         (document-keyword :currentLiquidityRate))
+                :required (document-vector (document-keyword :liquidityIndex))))
+(defn main [] :i64
+  (+ (string-byte-length (dstr (dget (spec) :plural)))
+     (document-count (dget (spec) :fields))))

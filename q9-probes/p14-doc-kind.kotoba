@@ -1,0 +1,13 @@
+;; `(str v)` in apply-filters renders a field of ANY scalar type. document-kind
+;; answers a :keyword -- which keywords?
+(ns p (:export [main]))
+(defn kind-code [d :document] :i64
+  (let [k (document-kind d)]
+    (cond (= k :string) 1 (= k :i64) 2 (= k :bool) 3 (= k :keyword) 4
+          (= k :null) 5 (= k :f64) 6 (= k :vector) 7 (= k :map) 8 :else 0)))
+(defn main [] :i64
+  (+ (* 100000000 (kind-code (document-string "x")))
+     (+ (* 1000000 (kind-code (document-i64 1)))
+        (+ (* 10000 (kind-code (document-bool true)))
+           (+ (* 100 (kind-code (document-keyword :a)))
+              (kind-code (document-null)))))))

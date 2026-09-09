@@ -1,0 +1,5 @@
+;; The fixtures are JSON documents, so their literals contain quotes. Does the
+;; .kotoba reader take \" inside a string literal?
+(ns p (:export [main]))
+(defn body [] :string "{\"a\":1}")
+(defn main [] :i64 (string-byte-length (body)))

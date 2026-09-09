@@ -1,0 +1,8 @@
+;; The remaining heads the port needs: case-folding (as-bool's str/lower),
+;; joining (require-fields' str/join), and a set (reject-unknown's `set`).
+(ns p (:export [main]))
+(defn lower [s :string] :string (string-fold-case s))
+(defn joined [a :string b :string] :string (string-join ", " a b))
+(defn known [] [:set :keyword] (typed-set-new [:set :keyword] :ltv :isolated))
+(defn known? [k :keyword] :bool (typed-set-contains [:set :keyword] (known) k))
+(defn main [] :i64 (if (known? :ltv) (string-byte-length (joined (lower "AB") "c")) 0))

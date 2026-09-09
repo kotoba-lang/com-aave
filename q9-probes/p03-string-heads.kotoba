@@ -1,0 +1,14 @@
+;; Which string heads does this pin admit? The vocabulary tool
+;; (scripts/kotoba-admitted-vocabulary.cljs, reading the superproject's
+;; kotoba-sema checkout) advertises `string=` and `string-length`; amu's pin of
+;; kotoba-sema (96fd4e19) admits `string=?`, `string-byte-length` and
+;; `string-code-point-at` instead. This probe is the discriminator.
+(ns p (:export [main]))
+(defn b [x :string] :i64 (string-length x))
+(defn c [x :string i :i64] :i64 (string-code-point-at x i))
+(defn d [x :string] :i64 (string-byte-length x))
+(defn e [x :string y :string] :bool (string=? x y))
+(defn f [x :string y :string] :bool (string-contains? x y))
+(defn g [x :string y :string] :i64 (string-index-of x y))
+(defn h [x :string y :string] :i64 (string-split-count x y))
+(defn main [] :i64 (b "hi"))

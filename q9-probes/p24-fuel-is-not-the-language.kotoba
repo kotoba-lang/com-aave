@@ -1,0 +1,43 @@
+;; THE REFUSAL THAT WAS NOT THE LANGUAGE'S.
+;;
+;; The store, filter, handler and healthz oracles all answered
+;;   KEXE_TRAP {:kind :signal :signal :SIGTRAP}, exit 120
+;; on the aarch64 artifact, while the shorter-string oracles beside them
+;; answered normally. Two obvious explanations -- a string-length ceiling and a
+;; recursion-depth ceiling -- were both FALSE:
+;;
+;;   grow-linear  256 appends  -> 256   (depth 256, length 256)
+;;   grow-double  2^10          -> 1024  (depth 10,  length 1024)
+;;
+;; The cause is tools/kexe_loader.c's own default:
+;;
+;;   static uint64_t kexe_initial_fuel = 512;   /* unless KEXE_FUEL says else */
+;;
+;; Fuel is charged per function ENTRY, and a scan that enters a function per
+;; byte of a 240-byte literal spends it. With KEXE_FUEL raised, every one of
+;; those oracles answers, and answers the same as aave.main:
+;;
+;;   KEXE_FUEL=100000000 ./kexe-loader ... oracle-store 0    -> 3
+;;   KEXE_FUEL=100000000 ./kexe-loader ... oracle-filters 0  -> 5
+;;   KEXE_FUEL=100000000 ./kexe-loader ... oracle-handlers 3 -> 200
+;;
+;; Recorded because it was one command away from being written down as "the
+;; store layer is blocked on the native backend", which would have been a
+;; refusal guessing its own reason (ADR-2609081600).
+;;
+;; grow-linear DOES still trap above ~256 even with fuel raised, with a
+;; DIFFERENT signal (SIGILL, not SIGTRAP) -- that one is the loader's
+;; KEXE_STRING_POOL_BYTES arena, and it is a separate measurement, not this one.
+(ns p (:export [grow-linear grow-double main]))
+
+(defn append-n [acc :string i :i64 n :i64] :string
+  (if (>= i n) acc (append-n (string-concat acc "x") (+ i 1) n)))
+
+(defn grow-linear [n :i64] :i64 (string-byte-length (append-n "" 0 n)))
+
+(defn double-k [acc :string i :i64 k :i64] :string
+  (if (>= i k) acc (double-k (string-concat acc acc) (+ i 1) k)))
+
+(defn grow-double [k :i64] :i64 (string-byte-length (double-k "x" 0 k)))
+
+(defn main [] :i64 (grow-linear 8))
