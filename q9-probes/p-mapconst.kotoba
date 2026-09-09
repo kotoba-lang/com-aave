@@ -1,0 +1,3 @@
+(ns p (:export [main]))
+(def one {:entity "ReserveData" :plural "reservedatas"})
+(defn main [] :i64 1)

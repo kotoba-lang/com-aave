@@ -1,0 +1,47 @@
+(ns aave.whole-component
+  (:capabilities #{:clock/now :entropy/draw})
+  (:export [route-path route-path-id page-limit clamp-limit has-more?
+            now-at new-id-suffix main]))
+
+(def ns-prefix "aave")
+(def tier "L4")
+(def default-limit 20)
+(def max-limit 100)
+
+(def entity-specs
+  [{:entity "ReserveData" :plural "reservedatas" :id-prefix "aave_res"}
+   {:entity "EModeCategory" :plural "emodecategories" :id-prefix "aave_emo"}
+   {:entity "UserConfigurationMap" :plural "userconfigurationmaps" :id-prefix "aave_use"}
+   {:entity "ExecuteBorrowParams" :plural "executeborrowparamses" :id-prefix "aave_exe"}])
+
+(defn route-path [plural :string] :string
+  (string-concat "/v1/" plural))
+
+(defn route-path-id [plural :string] :string
+  (string-concat (string-concat "/v1/" plural) "/{id}"))
+
+(defn page-limit [requested :i64] :i64
+  (if (> requested 0)
+    (if (> requested max-limit) max-limit requested)
+    default-limit))
+
+(defn clamp-limit [requested :i64] :i64
+  (page-limit requested))
+
+(defn has-more? [remaining :i64 limit :i64] :bool
+  (> remaining limit))
+
+;; --- mechanism, as declared capability imports -----------------------------
+;; `now` and `rand-hex16` in the .cljc reach the clock and the entropy source
+;; through host interop. ADR-q9 is explicit that a clock or a randomness
+;; source is NOT a reason to keep a component in Clojure: it crosses as a
+;; declared capability import, which is what these two are.
+
+(defn now-at [seed :i64] :i64
+  (clock/now seed))
+
+(defn new-id-suffix [seed :i64] :i64
+  (entropy/draw seed))
+
+(defn main [] :i64
+  (page-limit 250))

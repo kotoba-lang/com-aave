@@ -1,0 +1,5 @@
+(ns p (:export [main]))
+(defn greet [n :string] :string (string-concat "hi " n))
+(defn same? [a :string b :string] :bool (string=? a b))
+(defn part [s :string] :string (string-substring s 0 2))
+(defn main [] :i64 1)

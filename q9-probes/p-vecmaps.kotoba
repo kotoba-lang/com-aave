@@ -1,0 +1,4 @@
+(ns p (:export [main]))
+(def specs [{:entity "ReserveData" :plural "reservedatas"}
+            {:entity "EModeCategory" :plural "emodecategories"}])
+(defn main [] :i64 1)
