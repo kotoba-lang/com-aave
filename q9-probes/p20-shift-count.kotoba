@@ -1,0 +1,11 @@
+;; rand-hex16 wants the nibble at a LOOP position: (u64-shift-right w (* 4 i)).
+;;
+;;   amu check --jvm-free -> exit 65
+;;   "i64 shift count must be an integer literal in [0,63]"
+;;
+;; A shift count is part of the instruction, not a value, so the component
+;; divides by 16 i times instead (whole_component.kotoba, `div16`). Replace
+;; `(* 4 i)` with the literal 4 and this probe passes.
+(ns p (:export [main]))
+(defn nibble [w :i64 i :i64] :i64 (bit-and (u64-shift-right w (* 4 i)) 15))
+(defn main [] :i64 (nibble 255 1))

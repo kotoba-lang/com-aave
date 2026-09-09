@@ -1,0 +1,7 @@
+;; Narrowing p06: is the refusal about the map VALUE type, or about a map
+;; crossing a function boundary at all? Here no map is ever a parameter or a
+;; return type -- it is built and read inside one body.
+(ns p (:export [main]))
+(defn kind [] :i64
+  (typed-map-get (typed-map-new [:map :keyword :i64] :ltv 1 :isolated 3) :isolated 0))
+(defn main [] :i64 (kind))

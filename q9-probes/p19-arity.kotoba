@@ -1,0 +1,12 @@
+;; The JSON member walk wants six parameters (doc, key, index, i, len, n).
+;; It cannot have them: `max-parameters` is 5.
+;;
+;;   amu check --jvm-free -> exit 65
+;;   "function parameters exceed ABI-supported arity"
+;;
+;; So the walk is written twice in whole_component.kotoba -- once selecting by
+;; key name, once by position -- which is a cost of the ABI and not of the
+;; component. Delete one parameter and this probe passes.
+(ns p (:export [main]))
+(defn six [a :string b :string c :i64 d :i64 e :i64 f :i64] :i64 (+ c (+ d (+ e f))))
+(defn main [] :i64 (six "x" "y" 1 2 3 4))

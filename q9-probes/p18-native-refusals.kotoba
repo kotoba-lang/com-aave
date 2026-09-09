@@ -1,0 +1,25 @@
+;; The heads aave.main needs that `amu check` admits and the aarch64 native
+;; target refuses. Each line is separately reproducible by deleting the others.
+;;
+;;   string-fold-case   (str/lower in as-bool)      native exit 70
+;;     "typed values currently require the kotoba-script web target, typed
+;;      Wasm target, or qualified native string/scalar-record/option-i64/
+;;      result-i64 features"
+;;   string-split-count (str/split in expand)       native exit 70, same message
+;;   decimal-f64-parse + :f64 (as-float)            native exit 70, same message
+;;   typed-map (any key/value)                      native exit 70, same message
+;;   typed-set of :string                           native exit 70, same message
+;;   string-contains? / string-index-of             native exit 70
+;;     "aggregate ABI rejected: call-abi-not-admitted"
+;;   min                                            native exit 70, same ABI message
+;;
+;; typed-set of :keyword, string-join, string-replace-all, string-from-i64,
+;; keyword-from-string/keyword-name and [:option :string] all DO reach native.
+(ns p (:export [main]))
+(defn lower [s :string] :string (string-fold-case s))
+(defn parts [s :string] :i64 (string-split-count s ","))
+(defn f [s :string] :f64 (option-value-of [:option :f64] (decimal-f64-parse s) 0.0))
+(defn m [] :i64 (typed-map-count [:map :keyword :string] (typed-map-new [:map :keyword :string] :a "x")))
+(defn ss [] :bool (typed-set-contains [:set :string] (typed-set-new [:set :string] "a") "a"))
+(defn idx [s :string] :i64 (string-index-of s ","))
+(defn main [] :i64 (+ (parts (lower "A,B")) (m)))

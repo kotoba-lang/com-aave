@@ -1,0 +1,16 @@
+;; reject-unknown folds over (keys data). Can a :document map be ITERATED --
+;; entry by index, key back out -- which is what `keys` needs?
+(ns p (:export [main]))
+(defn dat [v :document i :i64] :document
+  (option-value-of [:option :document] (document-map-entry-at v i) (document-null)))
+(defn dvat [v :document i :i64] :document
+  (option-value-of [:option :document] (document-vector-at v i) (document-null)))
+(defn dkw [d :document] :keyword
+  (option-value-of [:option :keyword] (document-keyword-value d) :none))
+(defn data [] :document
+  (document-map :ltv (document-i64 7) :bogus (document-string "x")))
+;; the key of entry i, as a keyword
+(defn key-at [d :document i :i64] :keyword
+  (dkw (dvat (dat d i) 0)))
+(defn main [] :i64
+  (if (= (key-at (data) 1) :bogus) 1 0))

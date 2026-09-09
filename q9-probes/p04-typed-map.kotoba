@@ -1,0 +1,11 @@
+;; The refusal in p01 names the fix: (typed-map-new [:map :keyword :string] ...).
+;; Does that carry the entity-spec row, and can it be read back?
+(ns p (:export [main]))
+(defn spec [] [:map :keyword :string]
+  (typed-map-new [:map :keyword :string]
+                 :entity "ReserveData"
+                 :plural "reservedatas"
+                 :id-prefix "aave_res"))
+(defn plural-of [m [:map :keyword :string]] :string
+  (typed-map-get m :plural ""))
+(defn main [] :i64 (string-byte-length (plural-of (spec))))

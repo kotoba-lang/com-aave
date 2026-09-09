@@ -16,12 +16,12 @@
  :constructs-the-gap-table-called-blocking
  ;; Each is one minimal probe under `amu check --jvm-free`, probes in
  ;; ../../q9-probes and reproducible.
- {:string-literal            :pass   ; (defn label [] :string "hello")
-  :string-concat             :pass   ; the head is string-concat, not str
-  :string=                   :pass
+ {:string-literal            :pass    ; (defn label [] :string "hello")
+  :string-concat             :pass    ; the head is string-concat, not str
+  :string=                   :refuted ; corrected below: the head is string=?
   :string-substring          :pass
-  :count-over-list           :pass   ; [:list :i64]; [:vector ...] is not the type
-  :vector-of-maps-constant   :pass   ; (def specs [{:entity "..."} {...}])
+  :count-over-list           :pass    ; [:list :i64]; [:vector ...] is not the type
+  :vector-of-maps-constant   :refuted ; corrected below: passed only unused
   :map-constant              :pass}
 
  :capability-imports
@@ -110,18 +110,429 @@
 
  :not-done
  {:component-is-partial
-  "What compiles here is the data table, the derived route paths, the
-   pagination decision and the two capability imports. The coercion layer
-   (as-int/as-float/as-bool over untrusted strings), the store, validation,
-   filters and the five handlers are NOT written. Calling this a
-   whole-component build would be the decision-core framing the ADR forbids,
-   one level up."}
+  "SUPERSEDED as of the same day by :layers-of-main-cljc below, which was
+   written after the rest of the component was. One layer of aave.main is
+   still missing and it is named there rather than here: as-float. Everything
+   else this key listed as NOT written -- as-int, as-bool, coerce-field, the
+   store, require-fields, reject-unknown, apply-filters, paginate, expand,
+   emit-facts, the five handlers, healthz, start! -- is written, compiles to
+   an aarch64 artifact, and answers the same as aave.main under the oracle in
+   q9-oracle.cljs. This key is kept rather than deleted because the sentence
+   it ends with is still the right test and the next reader should apply it
+   to the current state, not to this one."
+ :as-float
+  "Not written. :f64 and decimal-f64-parse pass amu check and the aarch64
+   backend refuses them -- q9-probes/p12-f64.kotoba, native exit 70, message
+   in :layers-of-main-cljc. No entity spec in this component coerces a field
+   to :float, so nothing here reaches it; it is still a public function of the
+   oracle and it is still missing."}
 
  :consequence-for-the-tranche
- "The nine remaining wave-1 pilots are one template: 215 lines each, differing
-  in 36 -- the entity table and the ns docstring. Their existing `.kotoba`
-  files are decision-core slices whose own comments say `no strings, no maps,
-  no folds` and `strings are outside the admitted subset`. That premise is
-  false. Requalifying them is one judgement applied nine times, not nine
-  investigations -- but the judgement needs a whole component that RUNS, and
-  that is blocked on extract-native, not on the language."}
+ ;; Re-measured 2026-09-09 across the whole family, correcting the numbers this
+ ;; key carried when it was first committed. Every number below was counted;
+ ;; the ones it replaces were remembered.
+ {:how-many
+  "29 repos under orgs/kotoba-lang carry this generated actor template (a
+   main.cljc with entity-specs / routes / handle-create / handle-list /
+   page-limit / as-int, plus .kotoba under src/) and all 29 carry a
+   kotoba-qualification.edn. Ten of those additionally carry a
+   q9-soak-observation.edn with :tranche :wave-1-tranche-1 -- that ten is the
+   wave-1 cohort, this repo among them. The other 19 are the same generator
+   output and are not soak-tracked."
+
+  :what-they-actually-record
+  "Only com-aadhaar carries a migration-record.edn with :disposition :blocked.
+   The other nine, com-aave included, carry NO migration-record at all; their
+   only disposition is :consumer-cutover false in kotoba-qualification.edn and
+   :consumer-cutover-authorized false in q9-soak-observation.edn. So `nine
+   pilots recorded as blocked` was wrong: nine were never recorded as blocked,
+   they were recorded as not authorized to cut consumers over, which is a
+   different and weaker claim."
+
+  :they-are-one-template-but-not-the-one-i-described
+  {:claimed "215 lines each, differing in 36 -- entity table and docstring"
+   :measured
+   "main.cljc line counts: 197 (aadhaar), 209 (aave), 215 (abb-robotics,
+    accela, accelbyte, ach-network, acorrd-standards, adobe), 216 (acquia),
+    234 (aftership). Between two 215-line pilots the diff is 25 lines changed,
+    not 36; two other same-length pairs measured 26. The KIND of difference
+    was right -- ns name and docstring, ns-prefix, the entity-specs table, the
+    healthz/start! strings -- and only the magnitude and the uniformity were
+    invented."}
+
+  :and-one-of-them-is-not-a-decision-core-slice
+  "com-aadhaar has no paginate.kotoba and no `No strings, no maps, no folds`
+   comment. It already carries src/.../whole-component.kotoba, 162 lines. So
+   the premise this repo's commit disproved is carried by eight of the nine,
+   not nine, and the ninth has an earlier whole-component attempt that should
+   be read before another one is written."
+
+  :where-that-leaves-the-tranche
+  "Requalifying is still one judgement applied to a family rather than N
+   investigations. What it needs is unchanged: a whole component that runs.
+   That is no longer blocked on the compiler -- see
+   :the-internal-compiler-error-was-mine and
+   :executed -- and as of the same day it is no longer blocked on the rest of
+   this component being written either. It is written, it compiles for
+   aarch64-macos, and every layer but as-float was run and compared against
+   aave.main; see :layers-of-main-cljc. What the family now inherits is not a
+   blocker but a shape: the rows cross as JSON text because the native backend
+   refuses :document (:the-carrier-measurement), and the store is threaded
+   because ambient module state is refused. Both of those are the same for all
+   ten pilots, because all ten are the same template."}
+ :the-carrier-measurement
+ ;; The one measurement that decided how the rest of the component is written.
+ {:question
+  "amu check admits :document, which the skill and amu's own todo-app.kotoba
+   name as the idiomatic carrier for heterogeneous data. Does the target this
+   component must RUN on admit it?"
+  :answer :no
+  :probe "q9-probes/p17-native-carrier.kotoba"
+  :check-exit 0
+  :native-exit 70
+  :native-message
+  "typed values currently require the kotoba-script web target, typed Wasm
+   target, or qualified native string/scalar-record/option-i64/result-i64
+   features"
+  :control-that-makes-it-a-measurement
+  "The same pair of verdicts holds for amu's own two reference applications,
+   in opposite directions: examples/todo-app.kotoba (document carrier)
+   compiles for no native target, examples/approval-queue-app.kotoba (string
+   carrier) compiles for aarch64-macos. So the refusal is the carrier's and
+   not this component's."
+  :what-follows
+  "The rows cross as JSON text, the way approval-queue-app's state does. For a
+   REST actor that is the wire format the component already speaks, so it is
+   not a reshaping of the domain to dodge the gap -- but it IS a gap, and a
+   :document-carried version of this component would pass check and produce no
+   artifact to run."
+  :other-heads-check-admits-and-native-refuses
+  "string-fold-case (str/lower), string-split-count (str/split), :f64 with
+   decimal-f64-parse (as-float), typed maps of every key/value pair tried,
+   typed sets of :string, and `min` -- the last three of those under a
+   different message, `aggregate ABI rejected: call-abi-not-admitted`, which
+   also covers string-contains? and string-index-of. Probe:
+   q9-probes/p18-native-refusals.kotoba. typed sets of :keyword, string-join,
+   string-replace-all, string-from-i64, keyword-from-string, keyword-name and
+   [:option :string] all DO reach native."}
+
+ :the-trap-that-was-fuel
+ ;; A refusal that was one command away from being written down as a language
+ ;; finding, in the exact shape ADR-2609081600 names.
+ {:symptom
+  "The store, filter, handler and healthz oracles all answered KEXE_TRAP
+   {:kind :signal :signal :SIGTRAP}, exit 120, on the aarch64 artifact, while
+   the shorter-string oracles beside them answered normally. `oracle-table 0`
+   trapped and `oracle-table 1,2,3` did not; the only difference between them
+   is that ReserveData's field list is a 240-byte literal."
+  :two-hypotheses-both-false
+  "A string-length ceiling and a recursion-depth ceiling. Both were measured
+   and both are false: 256 appends (depth 256, length 256) answers 256, and
+   10 doublings (depth 10, length 1024) answers 1024. Probe:
+   q9-probes/p24-fuel-is-not-the-language.kotoba."
+  :actual-cause
+  "tools/kexe_loader.c: `static uint64_t kexe_initial_fuel = 512;` unless
+   KEXE_FUEL names another budget. Fuel is charged per function ENTRY, and a
+   scan that enters a function per byte of a 240-byte literal spends it."
+  :verification
+  "With KEXE_FUEL=100000000 every trapping oracle answers, and answers the
+   same number aave.main answers. Nothing in the component changed."
+  :why-it-is-recorded
+  "Had it been written down as measured, this file would say the store layer
+   is blocked on the native backend, and nine other repos in this family would
+   have inherited that. The loader's default budget is not the language."}
+
+ :layers-of-main-cljc
+ ;; One entry per layer of src/aave/main.cljc. :ported means the layer is in
+ ;; src/aave/whole_component.kotoba, compiles for aarch64-macos, and was RUN
+ ;; and compared against aave.main. Nothing here is rounded up.
+ {:entity-specs
+  {:status :ported
+   :evidence
+   "oracle-table 0..3 against the joined entity|plural|id-prefix|fields|
+    required|coerce line built from aave.main/entity-specs. 1, 2 and 3 are
+    hash-equal. 0 is not, and the difference is entirely the ITERATION ORDER
+    of ReserveData's 9-entry :coerce map, which Clojure makes a hash map at
+    that size: measured set-equal (9 pairs both sides), while :fields and
+    :required -- which are vectors and genuinely ordered -- are string-equal.
+    :coerce is only ever read with (get coerce f), so its order is not
+    semantic."}
+  :routes
+  {:status :ported
+   :evidence
+   "oracle-route-shape 0..19 against (str/join \" \" [method path (str op
+    \"|\" entity)]) over aave.main/routes. All twenty hashes equal."}
+  :now
+  {:status :ported-with-a-stub-clock
+   :evidence
+   "The clock crosses as the declared capability import :clock/now (wire 7)
+    and the call traps when the grant is withdrawn. The RFC-3339 rendering --
+    Howard Hinnant's civil_from_days in i64 arithmetic plus string-from-i64,
+    because Kotoba has no date library -- was checked against an independent
+    oracle, (.toISOString (js/Date. (* 1000 secs))) with the milliseconds
+    removed, at epochs 0, 1, 1000000000 and 1757000000. All four hashes equal."
+   :what-is-not-real
+   "The number the clock capability answers under tools/kexe_loader.c is NOT a
+    wall clock. Measured: (clock/now s) answers s+1 for s in 0,1,2,10, so
+    (now s) renders the instant s+1 seconds after the epoch. kexe_loader.c's
+    hosted_clock_v1 wants a structured request (an ordinal and a payload
+    packed into the i64) which this component does not construct, so the call
+    takes the echo path. The capability is wired and the arithmetic is
+    verified; the input is a stub."}
+  :new-id
+  {:status :ported
+   :evidence
+   "prefix + \"_\" + sixteen hex digits, from :entropy/draw (wire 23). The
+    call traps when the grant is withdrawn, and the answer varies with the
+    seed (oracle-entropy 1 and 2 differ). Not compared against aave.main,
+    which draws a UUID: there is no oracle for a random value, and claiming
+    one would be the failure this file exists to avoid."
+   :cost
+   "A shift COUNT must be an integer literal in [0,63], so the nibble at a
+    loop position cannot be reached by shifting. Probe:
+    q9-probes/p20-shift-count.kotoba. The component divides by 16 i times
+    instead, after masking the sign bit so quot's truncation agrees with a
+    logical shift."}
+  :as-int
+  {:status :ported
+   :evidence
+   "oracle-as-int over seven inputs. Six agree with aave.main on BOTH hosts:
+    \"12\" 12, \" 42 \" 42, \"-7\" -7, \"\" 0, \"true\" 0, \"null\" 0."
+   :the-seventh-input-has-no-single-oracle-answer
+   "\"12abc\": this port answers 0, the JVM answers 0, nbb answers 12. Both
+    measured, not read: `clojure -M -e '(aave.main/as-int \"12abc\")'` -> 0,
+    `nbb --classpath src` -> 12. aave.main/as-int is a reader conditional
+    whose :clj arm is (Long/parseLong (trim v)) inside a try/catch answering 0
+    and whose :cljs arm is (js/parseInt v 10), and parseInt takes the leading
+    digits. So the oracle disagrees with ITSELF on that input and `oracle
+    parity` is only well defined per host. This port matches the JVM arm."}
+  :as-float
+  {:status :blocked
+   :probe "q9-probes/p12-f64.kotoba"
+   :check-exit 0
+   :native-exit 70
+   :refusal
+   "typed values currently require the kotoba-script web target, typed Wasm
+    target, or qualified native string/scalar-record/option-i64/result-i64
+    features"
+   :note
+   "decimal-f64-parse exists and answers [:option :f64], so the parse failure
+    aave.main catches is representable -- the gap is :f64 on this backend, not
+    the parser. No entity spec in this component coerces to :float, so the
+    layer is unreachable from this component's data; it is still missing."}
+  :as-bool
+  {:status :ported
+   :evidence
+   "oracle-as-bool over nine inputs, all equal to aave.main: true TRUE Yes on
+    1 -> 1; 0 false \"\" nope -> 0."
+   :cost
+   "string-fold-case is a head, passes amu check, and the aarch64 backend
+    refuses it (q9-probes/p18-native-refusals.kotoba), so the ASCII case fold
+    is written out over code points. Only ASCII folds, which is all the four
+    literals as-bool compares against need."}
+  :coerce-field
+  {:status :ported-except-the-float-arm
+   :evidence
+   "oracle-coerce over seven cases covering the :int arm on a quoted string
+    and on a number, the :bool arm on a quoted string and on a JSON false, and
+    the identity arm on a string, on absent, and on absent-with-a-rule. Ran
+    and answered; the arms are exercised, and their answers were not hashed
+    against a rendered Clojure oracle because the rendering, not the decision,
+    is what a hash would compare there."
+   :missing "the :float arm, with as-float"}
+  :store
+  {:status :ported-threaded
+   :evidence
+   "oracle-store: 3 rows seeded -> 3; retract an existing id -> 2; retract a
+    missing id -> 3; persist an id that is already there -> 3 (replace, not
+    append); query a missing id -> the empty answer; a second entity -> 0. All
+    six equal to aave.main's fresh-store/persist!/query/retract!."
+   :the-shape-that-had-to-change
+   "aave.main holds the store in (def ^:dynamic *store* (atom {})). Ambient
+    module state is refused: q9-probes/p13-atom.kotoba, `constant value must
+    be closed bounded integer/string/keyword/boolean/nil/vector/map or
+    non-empty keyword-set data`. That refusal is the language's on purpose
+    (:ambient-authority-forbidden). Every handler in aave.main ALREADY takes
+    the store as its first argument, so the store is threaded out again in the
+    handler's answer. Rows are held in insertion order rather than in a map
+    keyed by id, which is what the starting_after cursor needs and what a
+    Clojure map's vals does not promise."}
+  :require-fields
+  {:status :ported
+   :evidence
+   "oracle-validation 0, 1 and 4 against the rendered {\"error\":{...}} built
+    from aave.main's own returned map. All three hashes equal, including the
+    empty answer for a complete body (7 is the hash of the empty string) and
+    the two-name message for an empty body."}
+  :reject-unknown
+  {:status :ported
+   :evidence
+   "oracle-validation 2, 3 and 5. All three hashes equal, including the
+    Unknown fields message naming `bogus` and the empty answer for a body
+    whose keys are all in the field list."
+   :cost
+   "(keys data) is read one position at a time by a second copy of the JSON
+    member walk, because the single walk that does both selections wants six
+    parameters and max-parameters is 5. Probe: q9-probes/p19-arity.kotoba."}
+  :apply-filters
+  {:status :ported
+   :evidence
+   "oracle-filters over six cases against aave.main/apply-filters on the same
+    five rows: no params 5, a matching string value 3, an empty want 5, a
+    matching numeric value 1, a non-matching value 0, a param that is not a
+    field 5. All six equal."}
+  :paginate
+  {:status :ported
+   :evidence
+   "oracle-paginate over six (rows, limit) pairs against aave.main/paginate,
+    encoded as page*10 + has_more: [5 2] 21, [5 5] 50, [5 0] 50, [5 200] 50,
+    [3 2] 21, [0 2] 0. All six equal. The starting_after cursor was run
+    separately (oracle-cursor): after row 0 of 5 -> 4, after row 2 -> 2, after
+    the last row -> 0, after an id that names no row -> 5."
+   :boundary
+   "[5 5] answers 50 and [3 2] answers 21 -- has_more is on the line at
+    remaining = limit, which is what separates > from >= there."}
+  :expand
+  {:status :ported-and-driven
+   :evidence
+   "refs is {} on all four entity specs, so the production fold is empty and a
+    probe that only called it would report a green that did nothing. Selector
+    0 is that empty case (record unchanged). Selectors 1 and 2 hand the fold a
+    SYNTHETIC ref table: asked for, the record changes; not asked for, it does
+    not. aave.main agrees on all three (changed? 0, 1, 0) and agrees that the
+    expanded object is nil, because the referenced id names no row."}
+  :emit-facts
+  {:status :ported
+   :evidence
+   "oracle-facts 1 against the rendered aave.<Entity>/<field> map built from
+    aave.main/emit-facts. Hash equal (128153051 both sides)."}
+  :handle-create
+  {:status :ported
+   :evidence
+   "status 201 on a good body, 400 on a missing required field, 400 on an
+    unknown field; and the store grows from 2 rows to 3. Four numbers, all
+    equal to aave.main."}
+  :handle-list
+  {:status :ported
+   :evidence "status 200 and the body's :total 2 on a 2-row store. Both equal."}
+  :handle-get
+  {:status :ported
+   :evidence
+   "200 on a present id, 404 on a missing one; and the body of the 200 hashes
+    to the same number as the row store-query answers for that id, which is
+    the cross-check that it returned the right row and not merely a row."}
+  :handle-update
+  {:status :ported
+   :evidence
+   "200 on a present id, 404 on a missing one, and the patched field reads
+    back as 99. Three numbers, all equal to aave.main."}
+  :handle-delete
+  {:status :ported
+   :evidence
+   "200 on a present id, 404 on a missing one, and the store shrinks from 2
+    rows to 1. Three numbers, all equal."}
+  :healthz
+  {:status :ported
+   :evidence
+   "oracle-healthz against the same envelope built from aave.main/healthz.
+    Hash equal (107517859 both sides), which covers the status, the actor
+    name, the tier and all four entity names in order."}
+  :start
+  {:status :ported
+   :evidence
+   "aave.main/start! answers :aave-compat/ready. Here it is (defn start []
+    :keyword :aave-compat/ready) and oracle-start answers the byte length of
+    its name. Not a behaviour worth an oracle; recorded so that it is not
+    quietly absent."}
+  :retained-kernels
+  {:status :ported
+   :evidence
+   "page-limit, clamp-limit, has-more? and as-int-kernel -- the four public
+    functions main.cljc kept beside paginate.kotoba -- are exported by name
+    rather than folded into their callers, and oracle-kernels runs all four.
+    page-limit was also run through the JSON params path as oracle-page-limit
+    over eight inputs including the 0 boundary, all equal to aave.main."}}
+
+ :re-measured-2026-09-09
+ ;; Claims this file and com-aadhaar's migration-record.edn carried, checked
+ ;; against amu at this worktree's pin. A claim is only listed if it was run.
+ {:vector-of-maps-constant-was-a-false-pass
+  "This file said `:vector-of-maps-constant :pass` on the strength of
+   q9-probes/p-vecmaps.kotoba, which DEFINES the vector and never uses it. Use
+   it -- q9-probes/p01-vecmaps-used.kotoba adds (count specs) -- and it is
+   refused: `map literal with keyword keys carries i64 values; the value at
+   key :entity is :string. A keyword-keyed literal lowers to the legacy
+   untagged pair map ... write (typed-map-new [:map :keyword :string] ...)`.
+   The entity-specs def that src/aave/whole_component.kotoba carried until
+   today was therefore dead code that would not have compiled if anything had
+   read it: an unused definition is not type-checked, so the probe and the
+   component were green for the same wrong reason."
+  :string=-is-not-the-head
+  "This file said `:string= :pass`. It is not a head at amu's pin of
+   kotoba-sema (96fd4e19): `unknown operation: string= is not a builtin, a
+   sugar head, or a function of this module; nearest defined: string=?
+   (builtin), string-byte-length (builtin), string-code-point-at (builtin)`.
+   Probe: q9-probes/p03-string-heads.kotoba. scripts/kotoba-admitted-
+   vocabulary.cljs prints string= and string-length because it reads the
+   SUPERPROJECT's kotoba-sema checkout, which is a different sha from the one
+   amu compiles against. The vocabulary tool is a guide; amu is the authority."
+  :integer-to-string-exists
+  "amu's own examples/todo-app.kotoba says in its header that Kotoba has no
+   integer-to-string builtin, and builds item keys out of a letter table
+   because of it. string-from-i64 is a head and reaches native:
+   q9-probes/p02-string-from-i64.kotoba, check 0, native 0. That header is a
+   correct record of the day it was written and a stale constraint now; this
+   component's RFC-3339 rendering depends on the head existing."
+  :typed-maps-are-admitted-and-my-first-four-probes-were-caller-error
+  "q9-probes/p04..p09 record a sequence in which typed maps looked refused at
+   check time. They were not: typed-map-get takes (type value key), and those
+   probes passed (map key default) in Clojure's shape, so the MAP was being
+   validated as a type descriptor and `value type is outside the safe profile`
+   was the honest answer to the program actually written. Corrected, every
+   key/value pair tried is admitted at check. They are refused by the aarch64
+   backend, which is a different fact and is recorded in
+   :the-carrier-measurement. The probes are kept failing as written because
+   the sequence is the point."
+  :com-aadhaar-gap-table
+  "com-aadhaar/migration-record.edn (:as-of 2026-09-03, amu 57ba0ee0) lists as
+   REJECTED: string literals anywhere, (count v), (reduce f 0 xs), (case x),
+   (min a b), map literals, vector-of-maps constants. Re-measured at this
+   pin: string literals pass, count over [:list :i64] passes, reduce passes,
+   case on a keyword passes, min passes amu check (and is refused by the
+   aarch64 backend under `aggregate ABI rejected: call-abi-not-admitted`,
+   which is a target fact and not a subset fact). The vector-of-maps constant
+   is genuinely refused when used, as above. That record's whole-component
+   attempt is a transliteration of main.cljc -- untyped defn parameters, str,
+   parse-long, trim, mapv, reduce-kv, and calls to persist!/query which the
+   file never defines -- so its :kotoba/source-read-failed is a fact about
+   that file and not about the language. NOTE: the com-aadhaar checkout read
+   here is at 73bac8ca, which is NOT the west pin 560d7444 for that path, and
+   the pin is not an ancestor of it."}
+
+ :not-measured
+ {:the-string-pool-ceiling
+  "q9-probes/p24's grow-linear still traps above roughly 256 appends with fuel
+   raised, and with a DIFFERENT signal (SIGILL, not SIGTRAP). That is almost
+   certainly kexe_loader.c's KEXE_STRING_POOL_BYTES arena rather than fuel,
+   but it was not bisected and the guess is not a measurement. It bounds how
+   many rows this component can hold in one artifact run and that bound is
+   unknown."
+  :fuel-required-by-this-component
+  "Every execution above was run at KEXE_FUEL=100000000, chosen for being
+   large. The actual fuel each layer needs was not measured, so nothing here
+   says what budget a host would have to grant."
+  :the-wasm-and-web-targets
+  "Only aarch64-macos was compiled. The message the native backend refuses
+   with names kotoba-script web and typed Wasm as targets that DO carry typed
+   values, so a :document-carried version of this component may well compile
+   there. Not tried."
+  :the-json-scanner-on-adversarial-input
+  "The scanner is carried from examples/approval-queue-app.kotoba and inherits
+   its bound: escape DECODING is not implemented, so a string value containing
+   a backslash is read as its raw bytes. Every fixture here is escape-free
+   ASCII. Behaviour on escaped or non-ASCII input is untested."
+  :consumer-cutover
+  "Nothing was cut over. aave.main remains the oracle and nothing requires
+   aave.whole-component. This is a whole-component BUILD that runs, not a
+   migration."}
+}

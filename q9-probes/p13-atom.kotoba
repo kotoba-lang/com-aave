@@ -1,0 +1,7 @@
+;; aave.main holds the store in a top-level atom behind a dynamic var:
+;;   (def ^:dynamic *store* (fresh-store))  ... (swap! store assoc-in ...)
+;; Is ambient mutable module state expressible?
+(ns p (:export [main]))
+(def store (atom 0))
+(defn bump [] :i64 (swap! store inc))
+(defn main [] :i64 (bump))

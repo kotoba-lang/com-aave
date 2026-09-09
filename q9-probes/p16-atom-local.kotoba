@@ -1,0 +1,5 @@
+;; `atom-local` is listed as sugar by scripts/kotoba-admitted-vocabulary.cljs.
+;; Is that spelling a head at amu's pin of kotoba-sema?
+(ns p (:export [main]))
+(defn counted [] :i64 (let [a (atom-local 0)] 1))
+(defn main [] :i64 (counted))

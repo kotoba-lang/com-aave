@@ -1,0 +1,6 @@
+;; The task brief says a map literal with :string KEYS becomes a canonical
+;; typed map whose value type is read off the literal. Measure it.
+(ns p (:export [main]))
+(def row {"plural" "reservedatas" "id-prefix" "aave_res"})
+(defn plural [] :string (typed-map-get row "plural" ""))
+(defn main [] :i64 (string-byte-length (plural)))

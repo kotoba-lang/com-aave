@@ -1,0 +1,5 @@
+;; todo-app.kotoba's header says "Kotoba has no integer-to-string builtin".
+;; approval-queue-app.kotoba calls `string-from-i64`. Which is true today?
+(ns p (:export [main]))
+(defn label [n :i64] :string (string-from-i64 n))
+(defn main [] :i64 (string-length (label 250)))

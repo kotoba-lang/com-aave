@@ -1,0 +1,8 @@
+;; p04/p05 refused a typed map whose VALUES are :string. Is the map type itself
+;; admitted at all, i.e. is the refusal about the value type or about maps?
+(ns p (:export [main]))
+(defn coerce-kinds [] [:map :keyword :i64]
+  (typed-map-new [:map :keyword :i64] :ltv 1 :isolated 3))
+(defn kind-of [m [:map :keyword :i64] k :keyword] :i64
+  (typed-map-get m k 0))
+(defn main [] :i64 (kind-of (coerce-kinds) :isolated))
