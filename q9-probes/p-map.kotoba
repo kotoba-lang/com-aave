@@ -1,0 +1,3 @@
+(ns p (:export [main]))
+(defn look [m [:map :keyword :i64]] :i64 (typed-map-get m :a 0))
+(defn main [] :i64 1)

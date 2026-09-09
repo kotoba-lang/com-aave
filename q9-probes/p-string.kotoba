@@ -1,0 +1,3 @@
+(ns p (:export [main]))
+(defn label [] :string "hello")
+(defn main [] :i64 1)

@@ -1,0 +1,63 @@
+;; What was measured on 2026-09-09 while attempting the whole-component build,
+;; and what was NOT. The `:blocked` disposition recorded for this tranche rests
+;; on a gap table; most of that table does not reproduce.
+{:as-of "2026-09-09"
+ :amu-checkout-caveat
+ "bin/amu was run from orgs/kotoba-lang/amu, which had 584 uncommitted files
+  from a concurrent session. `check` and `compile` results below are therefore
+  measured against a working tree, not against the pinned commit. A clean
+  worktree at the pin cannot run bin/amu at all -- it has no node_modules --
+  so this caveat could not be removed here."
+
+ :constructs-the-gap-table-called-blocking
+ ;; Each is one minimal probe under `amu check --jvm-free`, probes in
+ ;; ../../q9-probes and reproducible.
+ {:string-literal            :pass   ; (defn label [] :string "hello")
+  :string-concat             :pass   ; the head is string-concat, not str
+  :string=                   :pass
+  :string-substring          :pass
+  :count-over-list           :pass   ; [:list :i64]; [:vector ...] is not the type
+  :vector-of-maps-constant   :pass   ; (def specs [{:entity "..."} {...}])
+  :map-constant              :pass}
+
+ :capability-imports
+ ;; ADR-q9: a clock or an entropy source crosses as a DECLARED CAPABILITY
+ ;; IMPORT and is not a reason to keep a component in Clojure. Both of this
+ ;; component's mechanisms are reachable.
+ {:clock/now    {:wire-id 7  :status :pass}
+  :entropy/draw {:wire-id 23 :status :pass}
+  :form "(ns … (:capabilities #{:clock/now :entropy/draw})) then (clock/now x)"
+  :policy "{:allow #{[:cap/call 7] [:cap/call 23]}}"
+  :note "amu refuses a capability declared but never called, and refuses a
+         call the policy does not grant. Both refusals were observed."}
+
+ :built
+ {:check   {:command "amu check --jvm-free --policy policy.edn" :result :ok}
+  :compile {:command "amu compile --target aarch64-macos --policy policy.edn"
+            :result :ok :bytes 5577}}
+
+ :not-done
+ ;; Stated plainly because the skill's rule is that a build is not acceptance.
+ {:artifact-not-executed
+  "`amu extract-native --symbol main` answers `internal compiler error` -- on
+   this component, on amu's own examples/todo-app.kotoba, and on a minimal
+   `(defn main [] :i64 42)`. It is therefore NOT specific to this component.
+   It is also NOT attributed: the amu checkout is dirty (above), and the clean
+   worktree cannot run. So the artifact has not been executed and this
+   component is NOT accepted."
+  :component-is-partial
+  "What compiles here is the data table, the derived route paths, the
+   pagination decision and the two capability imports. The coercion layer
+   (as-int/as-float/as-bool over untrusted strings), the store, validation,
+   filters and the five handlers are NOT written. Calling this a
+   whole-component build would be the decision-core framing the ADR forbids,
+   one level up."}
+
+ :consequence-for-the-tranche
+ "The nine remaining wave-1 pilots are one template: 215 lines each, differing
+  in 36 -- the entity table and the ns docstring. Their existing `.kotoba`
+  files are decision-core slices whose own comments say `no strings, no maps,
+  no folds` and `strings are outside the admitted subset`. That premise is
+  false. Requalifying them is one judgement applied nine times, not nine
+  investigations -- but the judgement needs a whole component that RUNS, and
+  that is blocked on extract-native, not on the language."}
