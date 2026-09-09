@@ -2,12 +2,16 @@
 ;; and what was NOT. The `:blocked` disposition recorded for this tranche rests
 ;; on a gap table; most of that table does not reproduce.
 {:as-of "2026-09-09"
- :amu-checkout-caveat
- "bin/amu was run from orgs/kotoba-lang/amu, which had 584 uncommitted files
-  from a concurrent session. `check` and `compile` results below are therefore
-  measured against a working tree, not against the pinned commit. A clean
-  worktree at the pin cannot run bin/amu at all -- it has no node_modules --
-  so this caveat could not be removed here."
+ :amu-which-amu
+ "First measured against orgs/kotoba-lang/amu, which carried 584 uncommitted
+  files from a concurrent session -- a working tree, not the pin. That caveat
+  is now LIFTED for everything below: the numbers were re-measured in a clean
+  worktree of amu at origin/main 3ef1a709, which runs bin/amu once
+  node_modules is linked in from the sibling checkout (node_modules is not in
+  git, which is the whole reason a clean worktree looked unable to run). The
+  two trees disagree only where they should -- the same component compiles to
+  the same 5577 bytes but `main` sits at offset 636 under the older tree and
+  628 under the pin, because the pins below it moved."
 
  :constructs-the-gap-table-called-blocking
  ;; Each is one minimal probe under `amu check --jvm-free`, probes in
@@ -36,16 +40,76 @@
   :compile {:command "amu compile --target aarch64-macos --policy policy.edn"
             :result :ok :bytes 5577}}
 
- :not-done
- ;; Stated plainly because the skill's rule is that a build is not acceptance.
- {:artifact-not-executed
-  "`amu extract-native --symbol main` answers `internal compiler error` -- on
+ :executed
+ ;; A build is not acceptance. This is the execution.
+ ;; The artifact is EDN; `extract-native` lifts one exported symbol out of it
+ ;; as raw code, and `tools/kexe_loader.c` maps and calls it.
+ ;;   amu compile … --output wc.kexe
+ ;;   amu extract-native wc.kexe --symbol <sym> --output <sym>.bin
+ ;;   cc -std=c11 -O2 tools/kexe_loader.c -o kexe-loader
+ ;;   ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 [i64 ...]
+ {:host "aarch64 (aarch64-macos), 2026-09-09"
+  :main {:call "(page-limit 250)" :native 100 :oracle 100}
+
+  ;; aave.main/page-limit: (if (pos? r) (min r max-limit) default-limit),
+  ;; max-limit 100, default-limit 20. Eight inputs, native == oracle on all.
+  :page-limit {-5 20, 0 20, 1 1, 20 20, 99 99, 100 100, 101 100, 250 100}
+  :clamp-limit {0 20, 100 100, 101 100}
+
+  ;; aave.main/has-more-kernel?: (> remaining limit). 1 = true, 0 = false.
+  :has-more? {[99 100] 0, [100 100] 0, [101 100] 1}
+
+  :boundaries-that-discriminate
+  ;; The comparison rule: a check that owns an operator needs an input ON the
+  ;; line, or `>` and `>=` are the same program.
+  {:page-limit-at-0
+   "requested = 0 answers 20. Under `>=` the first test would take the other
+    arm and answer 0. This input separates the two operators; 100 does not
+    (both arms answer 100 there)."
+   :has-more-at-100-100
+   "remaining = limit answers 0. Under `>=` it answers 1."}
+
+  :capability-calls
+  {:now-at        {:wire 7  :result 1}
+   :new-id-suffix {:wire 23 :result 1}
+   :control
+   "The same two calls with the grant withdrawn (`kexe-loader … -`) do not
+    return a different number -- they trap: KEXE_TRAP {:kind :signal :signal
+    :SIGTRAP}, exit 120. So the grant is doing something, measured in both
+    directions rather than assumed from a green run."}}
+
+ :the-internal-compiler-error-was-mine
+ ;; Correcting the claim this file carried when it was first committed.
+ {:claimed
+  "`amu extract-native --symbol main` answers `internal compiler error` on
    this component, on amu's own examples/todo-app.kotoba, and on a minimal
-   `(defn main [] :i64 42)`. It is therefore NOT specific to this component.
-   It is also NOT attributed: the amu checkout is dirty (above), and the clean
-   worktree cannot run. So the artifact has not been executed and this
-   component is NOT accepted."
-  :component-is-partial
+   `(defn main [] :i64 42)` -- therefore not component-specific, therefore a
+   compiler defect blocking the tranche."
+  :actual
+  "`extract-native` does not read source. It reads the EDN artifact that
+   `compile --output` writes. All three inputs were .kotoba SOURCE files. One
+   caller error, made three times and read as three data points for one
+   conclusion. Handed the artifact instead, the same command answers :ok true
+   and the code it lifts runs (above)."
+  :the-part-that-is-a-real-defect
+  "The command answered `internal compiler error`, exit 70 -- the code
+   reserved for the compiler breaking -- for a caller naming the wrong file,
+   and discarded the underlying `No protocol method IAssociative.-assoc
+   defined for type object: (ns m (:export [main]))` on the way. That is the
+   8 questions' third (do not discard the error body) in the form
+   ADR-2609081600 names: a refusal that HAD a decidable reason and declined to
+   decide it. Fixed in amu as `source-path/admit-native-artifact!`, which
+   decides both halves -- the extension, which is a closed contract that
+   namespace already owns, and the keys extract-native is about to read.
+   Reverted, the new test goes from 0 failures to 6."
+  :what-it-cost
+  "About an hour, and a committed finding that named the wrong blocker for
+   nine other repos. The measurement that would have caught it immediately is
+   the one the skill already prescribes: run the artifact. I reported a build
+   as blocked without ever having a build to run."}
+
+ :not-done
+ {:component-is-partial
   "What compiles here is the data table, the derived route paths, the
    pagination decision and the two capability imports. The coercion layer
    (as-int/as-float/as-bool over untrusted strings), the store, validation,
