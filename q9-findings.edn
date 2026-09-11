@@ -117,7 +117,7 @@
    store, require-fields, reject-unknown, apply-filters, paginate, expand,
    emit-facts, the five handlers, healthz, start! -- is written, compiles to
    an aarch64 artifact, and answers the same as aave.main under the oracle in
-   q9-oracle.cljs. This key is kept rather than deleted because the sentence
+   q9-oracle.cljk. This key is kept rather than deleted because the sentence
    it ends with is still the right test and the next reader should apply it
    to the current state, not to this one."
  :as-float
@@ -263,7 +263,7 @@
    aave.main/routes' length (4 entities x 5 routes)."}
 
  :layers-of-main-cljc
- ;; One entry per layer of src/aave/main.cljc. :ported means the layer is in
+ ;; One entry per layer of src/aave/main.cljk. :ported means the layer is in
  ;; src/aave/whole_component.kotoba, compiles for aarch64-macos, and was RUN
  ;; and compared against aave.main. Nothing here is rounded up.
  {:entity-specs
