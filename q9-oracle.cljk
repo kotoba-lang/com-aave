@@ -3,7 +3,7 @@
   oracle this port is a port OF -- under nbb, and print the same numbers the
   aarch64 artifact prints.
 
-    nbb --classpath src q9-oracle.cljs
+    nbb --classpath src q9-oracle.cljk
 
   Two kinds of answer are printed, and they are not equally strong.
 
