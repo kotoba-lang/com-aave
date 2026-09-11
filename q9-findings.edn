@@ -320,8 +320,8 @@
     \"12\" 12, \" 42 \" 42, \"-7\" -7, \"\" 0, \"true\" 0, \"null\" 0."
    :the-seventh-input-has-no-single-oracle-answer
    "\"12abc\": this port answers 0, the JVM answers 0, nbb answers 12. Both
-    measured, not read: `clojure -M -e '(aave.main/as-int \"12abc\")'` -> 0,
-    `nbb --classpath src` -> 12. aave.main/as-int is a reader conditional
+    measured, not read: `kbb -M -e '(aave.main/as-int \"12abc\")'` -> 0,
+    `kbb --backend sci --classpath src` -> 12. aave.main/as-int is a reader conditional
     whose :clj arm is (Long/parseLong (trim v)) inside a try/catch answering 0
     and whose :cljs arm is (js/parseInt v 10), and parseInt takes the leading
     digits. So the oracle disagrees with ITSELF on that input and `oracle
