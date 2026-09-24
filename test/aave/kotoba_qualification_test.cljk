@@ -1,6 +1,6 @@
 (ns aave.kotoba-qualification-test
   (:require [aave.main :as oracle]
-            [clojure.test :refer [deftest is]]
+            [kotoba.test :refer [deftest is]]
             [kotoba.compiler.core :as compiler]
             [kotoba.compiler.ir :as compiler-ir]
             [kotoba.runtime :as runtime]
