@@ -1,0 +1,53 @@
+{:kotoba.lang.q9.migration-record/version 1
+ :repository "orgs/kotoba-lang/com-aave"
+ :as-of "2026-09-24"
+ :wave :wave-1
+ :disposition :whole-component-gates-green
+ :record-author
+ "jvm-dep-migrator tick85: the gate measurements below are fresh (2026-09-24,
+  amu 10202b13 frozen worktree /private/tmp/jvm-tick81/work). The component
+  source and its execution/parity evidence pre-date this tick and are cited,
+  not re-measured, where they are not re-run."
+ :component
+ {:source "src/aave/whole_component.kotoba"
+  :origin
+  "Committed 2026-09-09 (com-aave 32c5d5f 'q9: the whole component, and it
+   runs'), generated from aave.main's own entity-specs table by the wave-1
+   generator (scripts/gen-whole-component.cljs in kotoba-lang), the same
+   provenance as com-8th-wall's record. 172 defn, ns aave.whole-component,
+   rows crossing as JSON text because the aarch64 backend refuses :document
+   at compile (q9-probes/p17-native-carrier.kotoba)."
+  :capabilities "#{:clock/now :entropy/draw}"
+  :policy "policy.edn = {:allow #{[:cap/call 7] [:cap/call 23]}}"}
+ :builds
+ {:amu-check-wasm32 {:status :ok :exit 0}
+  :amu-compile-wasm32 {:status :ok :exit 0 :target :wasm32-kotoba-v1 :bytes 22063}
+  :amu-check-aarch64 {:status :ok :exit 0}
+  :amu-compile-aarch64 {:status :ok :exit 0 :target :aarch64-macos-kotoba-v1 :bytes 227072}
+  :policy-less-control
+  "check --jvm-free WITHOUT policy.rc=65 :kotoba/admission-denied 'capability
+   policy denies required effects' — deny-by-default admission, not a language
+   gap (tick83 established the same pair on com-aadhaar)."}
+ :executed
+ {:measured "2026-09-09 (q9-findings.edn :executed), not re-run this tick"
+  :harness "amu extract-native + cc -O2 tools/kexe_loader.c, KEXE_FUEL=100000000, aarch64 7,23"
+  :carried
+  {:page-limit "8/8 native==oracle (-5,0,1,20,99,100,101,250)"
+   :clamp-limit "3/3"
+   :has-more-kernel? "3/3"
+   :capability-control "grant withdrawn -> SIGTRAP exit 120 in both directions"}}
+ :parity
+ {:harness "q9-oracle.cljk (2026-09-09; the aave.main oracle runs under nbb, retained)"
+  :status "carried from q9-findings, not re-run this tick"}
+ :not-claimed
+ ["No execution measured this tick: the aarch64/wasm32 artifacts were compiled
+  and the gates re-measured; the 2026-09-09 execution and parity numbers are
+  cited, not re-run."
+  "No consumer cutover. main.cljk remains the oracle."
+  "as-float: public function of aave.main, NOT migrated — :f64 passes amu
+  check but the aarch64 backend refuses it (q9-probes/p12-f64.kotoba, native
+  exit 70). Per ADR-q9 this marks the surface, not a shrunk component."
+  "wasm32 artifact not executed (plain wasmtime lacks the
+  kotoba:typed::literal import; tick83)."]
+ :supersedes
+ "migration-evidence-gates-20260906.txt (page_limit/paginate slice only)"}
